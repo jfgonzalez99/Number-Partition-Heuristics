@@ -1,2 +1,2 @@
 all:
-	javac KarmarkarKarp.java && chmod +x kk
+	javac Partition.java && chmod +x partition
