@@ -1,2 +1,2 @@
 #!/bin/bash
-java -ea Partition $@
+java -ea src/Partition $@

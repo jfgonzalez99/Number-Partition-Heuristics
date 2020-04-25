@@ -1,2 +1,2 @@
 all:
-	javac Partition.java && chmod +x partition
+	javac src/Partition.java && chmod +x partition
