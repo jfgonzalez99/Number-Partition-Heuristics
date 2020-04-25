@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 class Partition {
     // Size of max heap for Karmark-Karp
-    static int sizeHeap = 0;
+    static int size = 0;
 
     public static void main(String[] args) {
         int testcode = Integer.parseInt(args[0]);
@@ -21,7 +21,6 @@ class Partition {
 
         if (testcode == 0) {
             numbers = new long[100];
-            maxHeap = new long[100];
 
             // Read numbers from input file
             try {
@@ -30,7 +29,6 @@ class Partition {
                 int i = 0;
                 while (s.hasNextLine()) {
                     numbers[i] = Long.parseLong(s.nextLine());
-                    insert(maxHeap, numbers[i]);
                     i++;
                 }
                 s.close();
@@ -39,25 +37,74 @@ class Partition {
             }
         }
 
-        if (testcode == 1) {
-            int n = 10;
+        else {
+            int n = 5;
             numbers = new long[n];
-            maxHeap = new long[n];
 
             for (int i = 0; i < n; i++) {
-                numbers[i] = ThreadLocalRandom.current().nextLong(1,100);
+                numbers[i] = ThreadLocalRandom.current().nextLong(1,10);
                 System.out.println(numbers[i]);
-                insert(maxHeap, numbers[i]);
             }
-            System.out.println();
-            printHeap(maxHeap);
 
             System.out.println();
-            extractMax(maxHeap);
-
-            System.out.println();
-            printHeap(maxHeap);
         }
+
+        // Karmarkar-Karp
+        if (algorithm == 0) {
+            System.out.println(KarmarkarKarp(numbers));
+        }
+        // Repeated Random
+        if (algorithm == 1) {
+            System.out.println();
+        }
+        // Hill Climbing
+        if (algorithm == 2) {
+            System.out.println();
+        }
+        // Simulated Annealing
+        if (algorithm == 3) {
+            System.out.println();
+        }
+        // Prepartitioned Repeated Random
+        if (algorithm == 11) {
+            System.out.println();
+        }
+        // Prepartitioned Hill Climbing
+        if (algorithm == 12) {
+            System.out.println();
+        }
+        // Prepartitioned Simulated Annealing
+        if (algorithm == 13) {
+            System.out.println();
+        }
+    }
+
+    /**
+     * Implementation of Karmarkar-Karp heuristic for the number partition 
+     * problem
+     * 
+     * @param A : list of positive 64-bit integers
+     * @return An upper bound for the residue
+     */
+    public static long KarmarkarKarp(long[] A) {
+        int n = A.length;
+        long[] maxHeap = new long[n];
+        size = 0;
+        for (long num : A) {
+            insert(maxHeap, num);
+        }
+
+        long max1;
+        long max2;
+        for (int i = 0; i < n-2; i++) {
+            max1 = extractMax(maxHeap);
+            max2 = extractMax(maxHeap);
+            insert(maxHeap, max1 - max2);
+        }
+
+        max1 = extractMax(maxHeap);
+        max2 = extractMax(maxHeap);
+        return max1 - max2;
     }
 
     /**
@@ -88,11 +135,12 @@ class Partition {
      * Inserts x into the binary max heap H
      * 
      * @param H
+     * @param size : size of H
      * @param x
      */
     public static void insert(long[] H, long x) {
-        H[sizeHeap] = x;
-        int n = sizeHeap;
+        H[size] = x;
+        int n = size;
         int p = parent(n);
         while (n != 0 && H[p] < H[n]) {
             // Swap parent with current
@@ -104,7 +152,7 @@ class Partition {
             n = p;
             p = parent(n);
         }
-        sizeHeap++;
+        size++;
     }
 
     /**
@@ -112,13 +160,14 @@ class Partition {
      * structure
      * 
      * @param H
-     * @return
+     * @param size : size of H
+     * @return max
      */
     public static long extractMax(long[] H) {
         long max = H[0];
-        H[0] = H[sizeHeap-1];
-        H[sizeHeap-1] = 0;
-        sizeHeap--;
+        H[0] = H[size-1];
+        H[size-1] = 0;
+        size--;
         // Rearrange tree to be a max heap
         maxHeapify(H, 0); 
         return max;
@@ -128,6 +177,7 @@ class Partition {
      * Rearranges the tree rooted at root to be a max heap
      * 
      * @param H
+     * @param size : size of H
      * @param root
      */
     public static void maxHeapify(long[] H, int root) {
@@ -136,14 +186,14 @@ class Partition {
         int largest;
 
         // Check if left child is largest
-        if (l < sizeHeap && H[l] > H[root]) {
+        if (l < size && H[l] > H[root]) {
             largest = l;
         }
         else {
             largest = root;
         }
         // Check if right child is largest
-        if (r < sizeHeap && H[r] > H[largest]) {
+        if (r < size && H[r] > H[largest]) {
             largest = r;
         }
         
@@ -161,16 +211,17 @@ class Partition {
      * Prints binary heap H
      * 
      * @param H
+     * @param size : size of H
      */
     public static void printHeap(long[] H) {
-        int height = (int) Math.floor(Math.log(sizeHeap) / Math.log(2)) + 1;
+        int height = (int) Math.floor(Math.log(size) / Math.log(2)) + 1;
         int i = 0;
         int j = 0;
         int elements = 1;
         while (i < height) {
             elements += 2 * i;
             while (j < elements) {
-                if (j < sizeHeap) {
+                if (j < size) {
                     System.out.print(Long.toString(H[j]) + " ");
                 }
                 j++;
