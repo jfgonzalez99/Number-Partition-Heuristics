@@ -7,7 +7,7 @@ import java.util.Random;
 
 class Partition {
     // Size of max heap for Karmark-Karp
-    static int size = 0;
+    static int size;
     static int max_iter = 25000;
 
     public static void main(String[] args) {
@@ -17,8 +17,6 @@ class Partition {
 
         // List of numbers to be partitioned
         long[] numbers;
-        // Binary max heap for Karmar-Karp
-        long[] maxHeap;
 
         if (testcode == 0) {
             numbers = new long[100];
@@ -79,6 +77,10 @@ class Partition {
             System.out.println();
         }
     }
+
+    /*-----------------------------------------------------*/
+    /*------ Heuristics for number partition problem ------*/
+    /*-----------------------------------------------------*/
 
     /**
      * Implementation of Karmarkar-Karp heuristic for the number partition 
@@ -182,6 +184,10 @@ class Partition {
         return Math.abs(r);
     }
 
+    /*-----------------------------------------------------*/
+    /*----- Functions for generating random solutions -----*/
+    /*-----------------------------------------------------*/
+
     /**
      * Returns a random solution of length n
      * 
@@ -227,6 +233,10 @@ class Partition {
         }
         return N;
     }
+
+    /*-------------------------------------------------------*/
+    /*---- Functions for binary max heap data structure -----*/
+    /*-------------------------------------------------------*/
 
     /**
      * @param n
