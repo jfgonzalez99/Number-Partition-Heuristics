@@ -62,7 +62,7 @@ class Partition {
         }
         // Simulated Annealing
         if (algorithm == 3) {
-            System.out.println();
+            System.out.println(SimulatedAnnealing(numbers));
         }
         // Prepartitioned Repeated Random
         if (algorithm == 11) {
@@ -114,7 +114,7 @@ class Partition {
      * Repeatedly generate random solutions and return the one with the 
      * smallest residue
      * 
-     * @param A : list of numbers
+     * @param A : list of positive 64-bit integers
      * @return r : residue of solution
      */
     public static long RepeatedRandom(long[] A) {
@@ -143,7 +143,7 @@ class Partition {
      * Start with a random solution and try to improve it through moves to 
      * better neighbors
      * 
-     * @param A
+     * @param A : list of positive 64-bit integers
      * @return r : residue of solution
      */
     public static long HillClimbing(long[] A) {
@@ -169,6 +169,51 @@ class Partition {
     }
 
     /**
+     * Start with a random solution and try to improve it through moves to 
+     * neigbors that are not necessarily better. Higher probability of makeing 
+     * worse moves at the beginning.
+     * 
+     * @param A : list of positive 64-bit integers
+     * @return r3 : residue of solution
+     */
+    public static long SimulatedAnnealing(long[] A) {
+        int n = A.length;
+        int[] S = randSolution(n);
+        long r = residue(A, S, n);
+        int[] S3 = S.clone();
+        long r3 = r;
+        Random rand = new Random();
+
+        for (int i = 0; i < max_iter; i++) {
+            int[] S2 = randNeighbor(S, n);
+            long r2 = residue(A, S2, n);
+            if (r2 < r) {
+                S = S2;
+                r = r2;
+            }
+            else if (rand.nextDouble() < probability(r, r2, i)) {
+                S = S2;
+                r = r2;
+            }
+            if (r < r3) {
+                S3 = S.clone();
+                r3 = r;
+            }
+        }
+
+        for (int s : S3) {
+            System.out.print(Integer.toString(s) + " ");
+        }
+        System.out.println();
+
+        return r3;
+    }
+
+    /*-----------------------------------------------------*/
+    /*---------- Helper functions for heuristics ----------*/
+    /*-----------------------------------------------------*/
+
+    /**
      * Given a sequence of positive integers A and solution S returns residue
      * 
      * @param A
@@ -182,6 +227,31 @@ class Partition {
             r += A[i] * S[i];
         }
         return Math.abs(r);
+    }
+
+    /**
+     * Returns the "temperature" at iteration i
+     * 
+     * @param i
+     * @return temperature
+     */
+    public static double temp(int i) {
+        int r = (int) Math.floor(i/300);
+        long powTenTen = 10000000000L;
+        return powTenTen * Math.pow(0.8, r);
+    }
+
+    /**
+     * Returns the probability of swiching from solution with residue of r1 to 
+     * neigbor with residue of r2 at iteration i where r2 >= r1
+     * 
+     * @param r1
+     * @param r2
+     * @param i
+     * @return probability
+     */
+    public static double probability(long r1, long r2, int i) {
+        return Math.exp(-(r2 - r1) / temp(i));
     }
 
     /*-----------------------------------------------------*/
