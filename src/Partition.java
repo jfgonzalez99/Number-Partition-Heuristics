@@ -3,10 +3,12 @@ import java.io.*;
 import java.util.Scanner;
 import java.lang.Math;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.Random;
 
 class Partition {
     // Size of max heap for Karmark-Karp
     static int size = 0;
+    static int max_iter = 25000;
 
     public static void main(String[] args) {
         int testcode = Integer.parseInt(args[0]);
@@ -15,7 +17,6 @@ class Partition {
 
         // List of numbers to be partitioned
         long[] numbers;
-
         // Binary max heap for Karmar-Karp
         long[] maxHeap;
 
@@ -55,7 +56,7 @@ class Partition {
         }
         // Repeated Random
         if (algorithm == 1) {
-            System.out.println();
+            System.out.println(RepeatedRandom(numbers));
         }
         // Hill Climbing
         if (algorithm == 2) {
@@ -105,6 +106,72 @@ class Partition {
         max1 = extractMax(maxHeap);
         max2 = extractMax(maxHeap);
         return max1 - max2;
+    }
+
+    /**
+     * Repeatedly generate random solutions and return the one with the 
+     * smallest residue
+     * 
+     * @param A : list of numbers
+     * @return r : residue
+     */
+    public static long RepeatedRandom(long[] A) {
+        int n = A.length;
+        int[] S = randSolution(n);
+        long r = residue(A, S, n);
+
+        for (int i = 0; i < max_iter; i++) {
+            int[] S2 = randSolution(n);
+            long r2 = residue(A, S2, n);
+            if (r2 < r) {
+                S = S2;
+                r = r2;
+            }
+        }
+
+        for (int s : S) {
+            System.out.print(Integer.toString(s) + " ");
+        }
+        System.out.println();
+        
+        return r;
+    }
+
+    /**
+     * Given a sequence of positive integers A and solution S returns residue
+     * 
+     * @param A
+     * @param S
+     * @param n : length of A
+     * @return r : residue
+     */
+    public static long residue(long[] A, int[] S, int n) {
+        int r = 0;
+        for (int i = 0; i < n; i++) {
+            r += A[i] * S[i];
+        }
+        return Math.abs(r);
+    }
+
+    /**
+     * Returns a random solution of length n
+     * 
+     * @param n
+     * @return S : solution
+     */
+    public static int[] randSolution(int n) {
+        Random rand = new Random();
+        int[] S = new int[n];
+        for (int i = 0; i < n; i++) {
+            int s = rand.nextInt(2);
+            if (s == 0) {
+                S[i] = -1;
+            }
+            else {
+                S[i] = 1;
+            }
+        }
+        return S;
     }
 
     /**
