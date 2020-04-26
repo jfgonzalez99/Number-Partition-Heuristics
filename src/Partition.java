@@ -60,7 +60,7 @@ class Partition {
         }
         // Hill Climbing
         if (algorithm == 2) {
-            System.out.println();
+            System.out.println(HillClimbing(numbers));
         }
         // Simulated Annealing
         if (algorithm == 3) {
@@ -113,7 +113,7 @@ class Partition {
      * smallest residue
      * 
      * @param A : list of numbers
-     * @return r : residue
+     * @return r : residue of solution
      */
     public static long RepeatedRandom(long[] A) {
         int n = A.length;
@@ -133,7 +133,36 @@ class Partition {
             System.out.print(Integer.toString(s) + " ");
         }
         System.out.println();
-        
+
+        return r;
+    }
+
+    /**
+     * Start with a random solution and try to improve it through moves to 
+     * better neighbors
+     * 
+     * @param A
+     * @return r : residue of solution
+     */
+    public static long HillClimbing(long[] A) {
+        int n = A.length;
+        int[] S = randSolution(n);
+        long r = residue(A, S, n);
+
+        for (int i = 0; i < max_iter; i++) {
+            int[] S2 = randNeighbor(S, n);
+            long r2 = residue(A, S2, n);
+            if (r2 < r) {
+                S = S2;
+                r = r2;
+            }
+        }
+
+        for (int s : S) {
+            System.out.print(Integer.toString(s) + " ");
+        }
+        System.out.println();
+
         return r;
     }
 
@@ -172,6 +201,31 @@ class Partition {
             }
         }
         return S;
+    }
+
+    /**
+     * Returns a random neigbor of a given solution S of length n
+     * 
+     * @param S
+     * @param n
+     * @return N : neighbor solution to S
+     */
+    public static int[] randNeighbor(int[] S, int n) {
+        Random rand = new Random();
+        int[] N = S.clone();
+        // Choose random element to change
+        int i = rand.nextInt(n);
+        N[i] = -1 * S[i];
+        // With probability 1/2 change another distinct random element
+        int p = rand.nextInt(2);
+        if (p == 1) {
+            int j = i;
+            while (j == i) {
+                j = rand.nextInt(n);
+            }
+            N[j] = -1 * S[j];
+        }
+        return N;
     }
 
     /**
