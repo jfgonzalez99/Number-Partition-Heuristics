@@ -42,9 +42,8 @@ class Partition {
 
             for (int i = 0; i < n; i++) {
                 numbers[i] = ThreadLocalRandom.current().nextLong(1,10);
-                System.out.println(numbers[i]);
+                System.out.print(Long.toString(numbers[i]) + " ");
             }
-
             System.out.println();
         }
 
@@ -66,15 +65,15 @@ class Partition {
         }
         // Prepartitioned Repeated Random
         if (algorithm == 11) {
-            System.out.println();
+            System.out.println(RepeatedRandom(prepartition(numbers)));
         }
         // Prepartitioned Hill Climbing
         if (algorithm == 12) {
-            System.out.println();
+            System.out.println(HillClimbing(prepartition(numbers)));
         }
         // Prepartitioned Simulated Annealing
         if (algorithm == 13) {
-            System.out.println();
+            System.out.println(SimulatedAnnealing(prepartition(numbers)));
         }
     }
 
@@ -257,6 +256,34 @@ class Partition {
     /*-----------------------------------------------------*/
     /*----- Functions for generating random solutions -----*/
     /*-----------------------------------------------------*/
+
+    /**
+     * Given a sequence A of n positive integers returns a new sequence A2 
+     * where each element has been randomly prepartitioned into one of n 
+     * possible groups
+     * 
+     * @param A
+     * @return A2
+     */
+    public static long[] prepartition(long[] A) {
+        Random rand = new Random();
+        int p_i;
+        int n = A.length;
+        long[] A2 = new long[n];
+
+        // Randomly partition each number in A to a random group p_i
+        for (int i = 0; i < n; i++) {
+            p_i = rand.nextInt(n);
+            A2[p_i] += A[i];
+        }
+
+        for (long a : A2) {
+            System.out.print(Long.toString(a) + " ");
+        }
+        System.out.println();
+
+        return A2;
+    }
 
     /**
      * Returns a random solution of length n
