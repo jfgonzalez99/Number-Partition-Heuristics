@@ -18,6 +18,8 @@ class Partition {
         // List of numbers to be partitioned
         long[] numbers;
 
+        // Read a list of 100 64-bit positive integers from a file and run the 
+        // given algorithm
         if (testcode == 0) {
             numbers = new long[100];
 
@@ -34,46 +36,68 @@ class Partition {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            
+            runAlgorithm(algorithm, numbers);
         }
 
+        // Generate 100 random lists of 100 64-bit positive integers and run 
+        // each algorithm on each list. Print the results and the time it took 
+        // each algorithm to run.
+        if (testcode == 1) {
+
+        }
+
+        // Create a list of n random 64-bit positive integers and run the given 
+        // algorithm
         else {
             int n = 5;
             numbers = new long[n];
 
+            // Generate n random numbers
             for (int i = 0; i < n; i++) {
-                numbers[i] = ThreadLocalRandom.current().nextLong(1,10);
+                numbers[i] = ThreadLocalRandom.current().nextLong(1, 10);
                 System.out.print(Long.toString(numbers[i]) + " ");
             }
             System.out.println();
-        }
 
+            runAlgorithm(algorithm, numbers);
+        }
+    }
+
+    /**
+     * Runs algorithm alg on a sequence of positive 64-bit integers A
+     * 
+     * @param alg
+     * @param A
+     */
+    public static void runAlgorithm(int alg, long[] A) {
         // Karmarkar-Karp
-        if (algorithm == 0) {
-            System.out.println(KarmarkarKarp(numbers));
+        if (alg == 0) {
+            System.out.println(KarmarkarKarp(A));
         }
         // Repeated Random
-        if (algorithm == 1) {
-            System.out.println(RepeatedRandom(numbers));
+        if (alg == 1) {
+            System.out.println(RepeatedRandom(A));
         }
         // Hill Climbing
-        if (algorithm == 2) {
-            System.out.println(HillClimbing(numbers));
+        if (alg == 2) {
+            System.out.println(HillClimbing(A));
         }
         // Simulated Annealing
-        if (algorithm == 3) {
-            System.out.println(SimulatedAnnealing(numbers));
+        if (alg == 3) {
+            System.out.println(SimulatedAnnealing(A));
         }
         // Prepartitioned Repeated Random
-        if (algorithm == 11) {
-            System.out.println(RepeatedRandom(prepartition(numbers)));
+        if (alg == 11) {
+            System.out.println(RepeatedRandom(prepartition(A)));
         }
         // Prepartitioned Hill Climbing
-        if (algorithm == 12) {
-            System.out.println(HillClimbing(prepartition(numbers)));
+        if (alg == 12) {
+            System.out.println(HillClimbing(prepartition(A)));
         }
         // Prepartitioned Simulated Annealing
-        if (algorithm == 13) {
-            System.out.println(SimulatedAnnealing(prepartition(numbers)));
+        if (alg == 13) {
+            System.out.println(SimulatedAnnealing(prepartition(A)));
         }
     }
 
@@ -179,7 +203,7 @@ class Partition {
         int n = A.length;
         int[] S = randSolution(n);
         long r = residue(A, S, n);
-        int[] S3 = S.clone();
+        int[] S3 = S;
         long r3 = r;
         Random rand = new Random();
 
@@ -195,7 +219,7 @@ class Partition {
                 r = r2;
             }
             if (r < r3) {
-                S3 = S.clone();
+                S3 = S;
                 r3 = r;
             }
         }
