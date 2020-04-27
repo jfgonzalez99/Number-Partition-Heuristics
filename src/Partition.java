@@ -1,4 +1,4 @@
-package src;
+// package src;
 import java.io.*;
 import java.util.Scanner;
 import java.lang.Math;
@@ -44,22 +44,20 @@ class Partition {
         // each algorithm on each list. Print the results and the time it took 
         // each algorithm to run.
         if (testcode == 1) {
+            for (int i = 0; i < 100; i++) {
+                long[] A = randLong(100, 1000000000000L);
 
+            }
         }
 
         // Create a list of n random 64-bit positive integers and run the given 
         // algorithm
-        else {
-            int n = 5;
-            numbers = new long[n];
-
-            // Generate n random numbers
-            for (int i = 0; i < n; i++) {
-                numbers[i] = ThreadLocalRandom.current().nextLong(1, 10);
-                System.out.print(Long.toString(numbers[i]) + " ");
-            }
-            System.out.println();
-
+        if (testcode == 2) {
+            // int n = 15;
+            // int b = 9;
+            // numbers = randLong(n, b);
+            numbers = new long[] {9,8,7,7,7,6,5,5,4,3,2,1,0,0,0};
+            printLongArr(numbers);
             runAlgorithm(algorithm, numbers);
         }
     }
@@ -71,33 +69,34 @@ class Partition {
      * @param A
      */
     public static void runAlgorithm(int alg, long[] A) {
+        int n = A.length;
         // Karmarkar-Karp
         if (alg == 0) {
-            System.out.println(KarmarkarKarp(A));
+            System.out.println(KarmarkarKarp(A,n));
         }
         // Repeated Random
         if (alg == 1) {
-            System.out.println(RepeatedRandom(A));
+            System.out.println(RepeatedRandom(A,n));
         }
         // Hill Climbing
         if (alg == 2) {
-            System.out.println(HillClimbing(A));
+            System.out.println(HillClimbing(A,n));
         }
         // Simulated Annealing
         if (alg == 3) {
-            System.out.println(SimulatedAnnealing(A));
+            System.out.println(SimulatedAnnealing(A,n));
         }
         // Prepartitioned Repeated Random
         if (alg == 11) {
-            System.out.println(RepeatedRandom(prepartition(A)));
+            System.out.println(prePartRepeatedRandom(A,n));
         }
         // Prepartitioned Hill Climbing
         if (alg == 12) {
-            System.out.println(HillClimbing(prepartition(A)));
+            System.out.println(prePartHillClimbing(A,n));
         }
         // Prepartitioned Simulated Annealing
         if (alg == 13) {
-            System.out.println(SimulatedAnnealing(prepartition(A)));
+            System.out.println(prePartSimulatedAnnealing(A,n));
         }
     }
 
@@ -110,10 +109,10 @@ class Partition {
      * problem
      * 
      * @param A : list of positive 64-bit integers
+     * @param n : length of A
      * @return An upper bound for the residue
      */
-    public static long KarmarkarKarp(long[] A) {
-        int n = A.length;
+    public static long KarmarkarKarp(long[] A, int n) {
         long[] maxHeap = new long[n];
         size = 0;
         for (long num : A) {
@@ -138,10 +137,10 @@ class Partition {
      * smallest residue
      * 
      * @param A : list of positive 64-bit integers
+     * @param n : length of A
      * @return r : residue of solution
      */
-    public static long RepeatedRandom(long[] A) {
-        int n = A.length;
+    public static long RepeatedRandom(long[] A, int n) {
         int[] S = randSolution(n);
         long r = residue(A, S, n);
 
@@ -154,12 +153,34 @@ class Partition {
             }
         }
 
-        for (int s : S) {
-            System.out.print(Integer.toString(s) + " ");
-        }
-        System.out.println();
-
+        // printIntArr(S);
         return r;
+    }
+
+     /**
+     * Repeatedly generate random prepartitions and return the one with the 
+     * smallest Karmarkar-Karp residue
+     * 
+     * @param A : list of positive 64-bit integers
+     * @param n : length of A
+     * @return r2 : Karmarkar-Karp residue of solution
+     */
+    public static long prePartRepeatedRandom(long[] A, int n) {
+        long[] A2 = regroup(A, prepartition(n), n);
+        long r2 = KarmarkarKarp(A2, n);
+        printLongArr(A);
+
+        for (int i = 0; i < max_iter; i++) {
+            long[] A3 = regroup(A, prepartition(n), n);
+            long r3 = KarmarkarKarp(A3, n);
+            if (r3 < r2) {
+                A2 = A3;
+                r2 = r3;
+            }
+        }
+
+        // printIntArr(A2);
+        return r2;
     }
 
     /**
@@ -167,10 +188,10 @@ class Partition {
      * better neighbors
      * 
      * @param A : list of positive 64-bit integers
+     * @param n : length of A
      * @return r : residue of solution
      */
-    public static long HillClimbing(long[] A) {
-        int n = A.length;
+    public static long HillClimbing(long[] A, int n) {
         int[] S = randSolution(n);
         long r = residue(A, S, n);
 
@@ -183,12 +204,36 @@ class Partition {
             }
         }
 
-        for (int s : S) {
-            System.out.print(Integer.toString(s) + " ");
-        }
-        System.out.println();
-
+        // printIntArr(S);
         return r;
+    }
+
+    /**
+     * Start with a random prepartition and try to improve it through moves to 
+     * better neighbors
+     * 
+     * @param A : list of positive 64-bit integers
+     * @param n : length of A
+     * @return r : Karmarkar-Karp residue of solution
+     */
+    public static long prePartHillClimbing(long[] A, int n) {
+        int[] P = prepartition(n);
+        long[] A2 = regroup(A, P, n);
+        long r2 = KarmarkarKarp(A2, n);
+
+        for (int i = 0; i < max_iter; i++) {
+            int[] P2 = randPartNeighbor(P, n);
+            long[] A3 = regroup(A, P2, n);
+            long r3 = KarmarkarKarp(A3, n);
+            if (r3 < r2) {
+                P = P2;
+                A2 = A3;
+                r2 = r3;
+            }
+        }
+
+        // printIntArr(A2);
+        return r2;
     }
 
     /**
@@ -197,10 +242,10 @@ class Partition {
      * worse moves at the beginning.
      * 
      * @param A : list of positive 64-bit integers
+     * @param n : length of A
      * @return r3 : residue of solution
      */
-    public static long SimulatedAnnealing(long[] A) {
-        int n = A.length;
+    public static long SimulatedAnnealing(long[] A, int n) {
         int[] S = randSolution(n);
         long r = residue(A, S, n);
         int[] S3 = S;
@@ -224,12 +269,52 @@ class Partition {
             }
         }
 
-        for (int s : S3) {
-            System.out.print(Integer.toString(s) + " ");
-        }
-        System.out.println();
-
+        // printIntArr(S3);
         return r3;
+    }
+
+    /**
+     * Start with a random prepartition and try to improve it through moves to 
+     * neigbors that are not necessarily better. Higher probability of makeing 
+     * worse moves at the beginning.
+     * 
+     * @param A : list of positive 64-bit integers
+     * @param n : length of A
+     * @return r4 : Karmarkar-Karp residue of solution
+     */
+    public static long prePartSimulatedAnnealing(long[] A, int n) {
+        int[] P = prepartition(n);
+        long[] A2 = regroup(A, P, n);
+        long r2 = KarmarkarKarp(A2, n);
+
+        int[] P3 = P;
+        long[] A4 = A2;
+        long r4 = r2;
+
+        Random rand = new Random();
+        for (int i = 0; i < max_iter; i++) {
+            int[] P2 = randPartNeighbor(P, n);
+            long[] A3 = regroup(A, P2, n);
+            long r3 = KarmarkarKarp(A3, n);
+            if (r3 < r2) {
+                P = P2;
+                A2 = A3;
+                r2 = r3;
+            }
+            else if (rand.nextDouble() < probability(r2, r3, i)) {
+                P = P2;
+                A2 = A3;
+                r2 = r3;
+            }
+            if (r2 < r4) {
+                P3 = P;
+                A4 = A2;
+                r4 = r2;
+            }
+        }
+
+        // printIntArr(A4);
+        return r4;
     }
 
     /*-----------------------------------------------------*/
@@ -277,36 +362,98 @@ class Partition {
         return Math.exp(-(r2 - r1) / temp(i));
     }
 
+    /**
+     * Prints array A with 64-bit integers on one line
+     * 
+     * @param A
+     */
+    public static void printLongArr(long[] A) {
+        for (long a : A) {
+            System.out.print(Long.toString(a) + " ");
+        }
+        System.out.println();
+    }
+
+    /**
+     * Prints array A with 32-bit integers on one line
+     * 
+     * @param A
+     */
+    public static void printIntArr(int[] A) {
+        for (int a : A) {
+            System.out.print(Integer.toString(a) + " ");
+        }
+        System.out.println();
+    }
+
     /*-----------------------------------------------------*/
     /*----- Functions for generating random solutions -----*/
     /*-----------------------------------------------------*/
 
     /**
-     * Given a sequence A of n positive integers returns a new sequence A2 
-     * where each element has been randomly prepartitioned into one of n 
-     * possible groups
+     * Generates a random partitioning P for n elements
+     * 
+     * @param n
+     * @return P
+     */
+    public static int[] prepartition(int n) {
+        Random rand = new Random();
+        int[] P = new int[n];
+        for (int i = 0; i < n; i++) {
+            P[i] = rand.nextInt(n);
+        }
+        return P;
+    }
+
+    /**
+     * Given a sequence A and partitioning P groups together all elements in A 
+     * that share the same partition group
      * 
      * @param A
+     * @param P
      * @return A2
      */
-    public static long[] prepartition(long[] A) {
-        Random rand = new Random();
-        int p_i;
-        int n = A.length;
+    public static long[] regroup(long[] A, int[] P, int n) {
         long[] A2 = new long[n];
-
-        // Randomly partition each number in A to a random group p_i
         for (int i = 0; i < n; i++) {
-            p_i = rand.nextInt(n);
-            A2[p_i] += A[i];
+            A2[P[i]] += A[i];
         }
-
-        for (long a : A2) {
-            System.out.print(Long.toString(a) + " ");
-        }
-        System.out.println();
-
         return A2;
+    }
+
+    /**
+     * Returns a random neigbor of a given partition P of length n
+     * 
+     * @param P
+     * @param n
+     * @return N : neighbor partition to P
+     */
+    public static int[] randPartNeighbor(int[] P, int n) {
+        Random rand = new Random();
+        int[] N = P.clone();
+        // Choose random element to change
+        int i = rand.nextInt(n);
+        int p = P[i];
+        while (p == P[i]) {
+            p = rand.nextInt(n);
+        }
+        N[i] = p;
+        return N;
+    }
+
+    /**
+     * Generate a series A of n random 64-bit numbers in [1,b]
+     * 
+     * @param n
+     * @param b
+     * @return A
+     */
+    public static long[] randLong(int n, long b) {
+        long[] A = new long[n];
+        for (int i = 0; i < n; i++) {
+            A[i] = ThreadLocalRandom.current().nextLong(1, b+1);
+        }
+        return A;
     }
 
     /**
