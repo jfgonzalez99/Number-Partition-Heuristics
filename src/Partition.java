@@ -168,7 +168,6 @@ class Partition {
     public static long prePartRepeatedRandom(long[] A, int n) {
         long[] A2 = regroup(A, prepartition(n), n);
         long r2 = KarmarkarKarp(A2, n);
-        printLongArr(A);
 
         for (int i = 0; i < max_iter; i++) {
             long[] A3 = regroup(A, prepartition(n), n);
