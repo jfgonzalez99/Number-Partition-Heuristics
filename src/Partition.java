@@ -33,20 +33,37 @@ class Partition {
                     i++;
                 }
                 s.close();
-            } catch (IOException e) {
+            } 
+            catch (IOException e) {
                 e.printStackTrace();
             }
             
-            runAlgorithm(algorithm, numbers);
+            System.out.println(runAlgorithm(algorithm, numbers));
         }
 
         // Generate 100 random lists of 100 64-bit positive integers and run 
         // each algorithm on each list. Print the results and the time it took 
         // each algorithm to run.
         if (testcode == 1) {
+            System.out.println("KK, KK_time, RR, RR_time, HC, HC_time, SA, SA_time, ppRR, ppRR_time, ppHC, ppHC_time, ppSA, ppS_timeA");
+            long[] A;
+            long r, startTime, endTime, t;
+            int[] algs = new int[] {0,1,2,3,11,12};
             for (int i = 0; i < 100; i++) {
-                long[] A = randLong(100, 1000000000000L);
-
+                A = randLong(100, 1000000000000L);
+                for (int alg : algs) {
+                    startTime = System.nanoTime();
+                    r = runAlgorithm(alg, A);
+                    endTime = System.nanoTime();
+                    t = endTime - startTime;
+                    System.out.print(Long.toString(r) + ", ");
+                    System.out.print(Long.toString(t) + ", ");
+                }
+                startTime = System.nanoTime();
+                r = runAlgorithm(13, A);
+                endTime = System.nanoTime();
+                t = endTime - startTime;
+                System.out.println(Long.toString(r) + ", " + Long.toString(t));
             }
         }
 
@@ -58,7 +75,7 @@ class Partition {
             // numbers = randLong(n, b);
             numbers = new long[] {9,8,7,7,7,6,5,5,4,3,2,1,0,0,0};
             printLongArr(numbers);
-            runAlgorithm(algorithm, numbers);
+            System.out.println(runAlgorithm(algorithm, numbers));
         }
     }
 
@@ -68,36 +85,37 @@ class Partition {
      * @param alg
      * @param A
      */
-    public static void runAlgorithm(int alg, long[] A) {
+    public static long runAlgorithm(int alg, long[] A) {
         int n = A.length;
         // Karmarkar-Karp
         if (alg == 0) {
-            System.out.println(KarmarkarKarp(A,n));
+            return KarmarkarKarp(A,n);
         }
         // Repeated Random
         if (alg == 1) {
-            System.out.println(RepeatedRandom(A,n));
+            return RepeatedRandom(A,n);
         }
         // Hill Climbing
         if (alg == 2) {
-            System.out.println(HillClimbing(A,n));
+            return HillClimbing(A,n);
         }
         // Simulated Annealing
         if (alg == 3) {
-            System.out.println(SimulatedAnnealing(A,n));
+            return SimulatedAnnealing(A,n);
         }
         // Prepartitioned Repeated Random
         if (alg == 11) {
-            System.out.println(prePartRepeatedRandom(A,n));
+            return prePartRepeatedRandom(A,n);
         }
         // Prepartitioned Hill Climbing
         if (alg == 12) {
-            System.out.println(prePartHillClimbing(A,n));
+            return prePartHillClimbing(A,n);
         }
         // Prepartitioned Simulated Annealing
         if (alg == 13) {
-            System.out.println(prePartSimulatedAnnealing(A,n));
+            return prePartSimulatedAnnealing(A,n);
         }
+        return -1;
     }
 
     /*-----------------------------------------------------*/
