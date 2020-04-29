@@ -70,10 +70,9 @@ class Partition {
         // Create a list of n random 64-bit positive integers and run the given 
         // algorithm
         if (testcode == 2) {
-            // int n = 15;
-            // int b = 9;
-            // numbers = randLong(n, b);
-            numbers = new long[] {9,8,7,7,7,6,5,5,4,3,2,1,0,0,0};
+            int n = 15;
+            int b = 9;
+            numbers = randLong(n, b);
             printLongArr(numbers);
             System.out.println(runAlgorithm(algorithm, numbers));
         }
@@ -347,7 +346,7 @@ class Partition {
      * @return r : residue
      */
     public static long residue(long[] A, int[] S, int n) {
-        int r = 0;
+        long r = 0;
         for (int i = 0; i < n; i++) {
             r += A[i] * S[i];
         }
